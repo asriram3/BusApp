@@ -10,7 +10,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -33,10 +35,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
-        LocationListener, NearbyFragment.OnFragmentInteractionListener {
+        NearbyFragment.OnFragmentInteractionListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -52,14 +59,26 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private LocationManager locationManager;
-    private String provider;
-    private final int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1234;
+    private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1234;
+    GoogleApiClient mGoogleApiClient;
+    private NearbyFragment nearbyFragment = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+            System.out.println("Initialized mGoogleApiClient!");
+        }
+
 
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
@@ -93,22 +112,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             }
         }
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        provider = locationManager.getBestProvider(criteria, false);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
-            return;
-        }
-        onLocationGranted();
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -128,44 +131,12 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        locationManager.requestLocationUpdates(provider, 400, 1, this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        locationManager.removeUpdates(this);
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 //        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION: {
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 if (grantResults.length > 0 &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
@@ -191,25 +162,117 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(MainActivity.this, "No permissions", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             return;
         }
-        if (locationManager == null) {
-            Log.d("BusApp", "reached here");
-            return;
-        }
-        Location location = locationManager.getLastKnownLocation(provider);
+
+        Toast.makeText(MainActivity.this, "Getting location", Toast.LENGTH_SHORT).show();
+
+        //TODO
+        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
         if (location == null) {
             Toast.makeText(MainActivity.this, "Location not available", Toast.LENGTH_SHORT).show();
             return;
         }
         Log.d("BusApp", "Lat: " + location.getLatitude() + "; Long: " + location.getLongitude());
+        if(nearbyFragment!=null)
+            nearbyFragment.setLocation(location);
+
         NearbyStops nearby = new NearbyStops(getBaseContext(), location.getLatitude(), location.getLongitude());
         try {
+            long init = System.currentTimeMillis();
             nearby.getNearbyStops();
+            long fin = System.currentTimeMillis();
+            Log.d("BusApp Nearby", "Calculating nearby stops took " + (fin - init) + "ms");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the sections/tabs/pages.
+     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            // getItem is called to instantiate the fragment for the given page.
+            // Return a PlaceholderFragment (defined as a static inner class below).
+            if (position == 0) {
+                return SearchFragment.newInstance("", "");
+            } else if (position == 2) {
+
+                System.out.println("Start of the app");
+
+                if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    nearbyFragment = NearbyFragment.newInstance(-1, -1);
+                    return nearbyFragment;
+                }
+
+                //TODO
+                Location location=null;
+                if(mGoogleApiClient!=null)
+                    location= LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+
+                if(location!=null){
+                    Toast.makeText(getBaseContext(), "Location available", Toast.LENGTH_SHORT).show();
+                    nearbyFragment = NearbyFragment.newInstance(location.getLatitude(), location.getLongitude());
+                    return nearbyFragment;
+                }
+                else{
+                    Toast.makeText(getBaseContext(), "Location not availble", Toast.LENGTH_SHORT).show();
+                    nearbyFragment = NearbyFragment.newInstance(-1,-1);
+                    return nearbyFragment;
+                }
+
+            }
+            return PlaceholderFragment.newInstance(position + 1);
+        }
+
+        @Override
+        public int getCount() {
+            // Show 3 total pages.
+            return 3;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "Search";
+                case 1:
+                    return "QuickView";
+                case 2:
+                    return "Nearby";
+            }
+            return null;
+        }
+    }
+
+
+    public class FetchNearbyLocations extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            return null;
         }
     }
 
@@ -233,36 +296,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        Toast.makeText(this, "Enabled new provider " + provider, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Toast.makeText(this, "Disabled provider " + provider, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onFragmentInteraction2(Uri uri) {
-
     }
 
     /**
@@ -300,62 +333,39 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         }
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
 
-        @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            if (position == 0) {
-                return SearchFragment.newInstance("", "");
-            } else if (position == 2) {
-                if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return NearbyFragment.newInstance(-1, -1);
-                }
-                Location location = locationManager.getLastKnownLocation(provider);
-                if(location!=null){
-                    return NearbyFragment.newInstance(location.getLatitude(), location.getLongitude());
-                }
-                else{
-                    return NearbyFragment.newInstance(-1,-1);
-                }
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
 
-            }
-            return PlaceholderFragment.newInstance(position + 1);
-        }
+    @Override
+    public void onFragmentInteraction2(Uri uri) {
 
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 3;
-        }
+    }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "Search";
-                case 1:
-                    return "QuickView";
-                case 2:
-                    return "Nearby";
-            }
-            return null;
-        }
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 }

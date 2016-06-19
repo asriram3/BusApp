@@ -1,6 +1,7 @@
 package com.project.aditya.busapp;
 
 import android.content.Context;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 /**
@@ -33,6 +35,8 @@ public class NearbyFragment extends Fragment {
 
     public NearbyFragment() {
         // Required empty public constructor
+//        Toast.makeText(getContext(), "Nearby Fragment's newInstance was called", Toast.LENGTH_SHORT).show();
+
     }
 
     /**
@@ -45,6 +49,7 @@ public class NearbyFragment extends Fragment {
      */
     // TODO: Rename and change types and number of parameters
     public static NearbyFragment newInstance(double param1, double param2) {
+
         NearbyFragment fragment = new NearbyFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, ""+param1);
@@ -76,9 +81,13 @@ public class NearbyFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void setLocation(Location location){
+        mParam1 = ""+location.getLatitude();
+        mParam2 = ""+location.getLongitude();
+        setLocation();
+    }
+
+    public void setLocation(){
         TextView tv = (TextView)getActivity().findViewById(R.id.textView_nearby);
         if(mParam1.equals("-1.0") || mParam2.equals("-1.0")){
             tv.setText("Location Not Available");
@@ -86,6 +95,12 @@ public class NearbyFragment extends Fragment {
         else{
             tv.setText("Lat: "+mParam1+"; Long: "+mParam2);
         }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setLocation();
     }
 
     @Override

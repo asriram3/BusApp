@@ -21,12 +21,14 @@ public class NearbyStops {
     private ArrayList<BusStop> latList;
     private ArrayList<BusStop> longList;
 
+
     public NearbyStops(Context ctxt, double lt, double lg){
         context = ctxt;
         lat = lt;
         lng = lg;
-        lat = 1.29694570097768;
-        lng = 103.76710295331488;
+//        lat = 1.29694570097768;
+//        lng = 103.76710295331488;
+
     }
 
     public ArrayList<BusStop> getNearbyStops()throws IOException, ClassNotFoundException{
@@ -49,6 +51,8 @@ public class NearbyStops {
         for(int i = 0; i< final_list.size(); i++){
             Log.d("BusApp Nearby", "No: "+final_list.get(i).num+" Name: "+final_list.get(i).name+" Dist: "+final_list.get(i).distance);
         }
+
+        long fin = System.currentTimeMillis();
 
         return new ArrayList<BusStop>();
     }
