@@ -40,6 +40,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
         NearbyFragment.OnFragmentInteractionListener, GoogleApiClient.ConnectionCallbacks,
@@ -121,9 +122,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                Intent intent = new Intent(getBaseContext(), BusStopActivity.class);
-                intent.putExtra("number", "17029");
-                //startActivity(intent);
                 onLocationGranted();
             }
         });
@@ -168,30 +166,17 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             return;
         }
 
-        Toast.makeText(MainActivity.this, "Getting location", Toast.LENGTH_SHORT).show();
-
-        //TODO
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         if (location == null) {
             Toast.makeText(MainActivity.this, "Location not available", Toast.LENGTH_SHORT).show();
             return;
         }
+
         Log.d("BusApp", "Lat: " + location.getLatitude() + "; Long: " + location.getLongitude());
+
         if(nearbyFragment!=null)
             nearbyFragment.setLocation(location);
-
-        NearbyStops nearby = new NearbyStops(getBaseContext(), location.getLatitude(), location.getLongitude());
-        try {
-            long init = System.currentTimeMillis();
-            nearby.getNearbyStops();
-            long fin = System.currentTimeMillis();
-            Log.d("BusApp Nearby", "Calculating nearby stops took " + (fin - init) + "ms");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -211,8 +196,15 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             if (position == 0) {
                 return SearchFragment.newInstance("", "");
             } else if (position == 2) {
-
-                System.out.println("Start of the app");
+                // Create an instance of GoogleAPIClient.
+                if (mGoogleApiClient == null) {
+                    mGoogleApiClient = new GoogleApiClient.Builder(getBaseContext())
+                            .addConnectionCallbacks((GoogleApiClient.ConnectionCallbacks) getBaseContext())
+                            .addOnConnectionFailedListener((GoogleApiClient.OnConnectionFailedListener) getBaseContext())
+                            .addApi(LocationServices.API)
+                            .build();
+                    System.out.println("Initialized mGoogleApiClient in SectionsPagerAdapter!");
+                }
 
                 if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
@@ -222,15 +214,18 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                     //                                          int[] grantResults)
                     // to handle the case where the user grants the permission. See the documentation
                     // for ActivityCompat#requestPermissions for more details.
+
                     nearbyFragment = NearbyFragment.newInstance(-1, -1);
                     return nearbyFragment;
                 }
 
                 //TODO
                 Location location=null;
-                if(mGoogleApiClient!=null)
-                    location= LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
+                location= LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+
+                onLocationGranted();
 
                 if(location!=null){
                     Toast.makeText(getBaseContext(), "Location available", Toast.LENGTH_SHORT).show();
@@ -268,13 +263,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     }
 
 
-    public class FetchNearbyLocations extends AsyncTask<Void, Void, Void>{
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            return null;
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

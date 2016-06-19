@@ -3,6 +3,7 @@ package com.project.aditya.busapp;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -29,32 +30,56 @@ public class NearbyStops {
 //        lat = 1.29694570097768;
 //        lng = 103.76710295331488;
 
+        latList = null;
+        longList = null;
+
     }
 
-    public ArrayList<BusStop> getNearbyStops()throws IOException, ClassNotFoundException{
+    public void loadLists()throws IOException, ClassNotFoundException{
         latList = getListFromFile("latList.ser");
         longList = getListFromFile("longList.ser");
+    }
+
+
+    public ArrayList<BusStop> getNearbyStops()throws IOException, ClassNotFoundException{
+        long init = System.currentTimeMillis();
+
+        if(latList == null || longList == null){
+            loadLists();
+        }
+
+
+        System.out.println("Time to get file: " + (System.currentTimeMillis()-init));
+        init = System.currentTimeMillis();
 
 //        for(int i = 0; i<25; i++){
 //            System.out.println(longList.get(i).num + "  long: " + longList.get(i).lng);
 //        }
+
+
 
         int latmin = getIndex((lat-0.009), 0);
         int latmax = getIndex((lat+0.009), 0);
         int longmin = getIndex((lng-0.009), 1);
         int longmax = getIndex((lng+0.009), 1);
 
+        System.out.println("Time to get border locations: " + (System.currentTimeMillis()-init));
+        init = System.currentTimeMillis();
+
         ArrayList<BusStop> final_list = getListFromIndices(latmin, latmax, longmin, longmax);
 
+        System.out.println("Time to get final list: " + (System.currentTimeMillis()-init));
+        init = System.currentTimeMillis();
+
         Collections.sort(final_list, BusStop.distComparator);
+
+        System.out.println("Time to sort final list: " + (System.currentTimeMillis()-init));
 
         for(int i = 0; i< final_list.size(); i++){
             Log.d("BusApp Nearby", "No: "+final_list.get(i).num+" Name: "+final_list.get(i).name+" Dist: "+final_list.get(i).distance);
         }
 
-        long fin = System.currentTimeMillis();
-
-        return new ArrayList<BusStop>();
+        return final_list;
     }
 
     public int getIndex(double val, int latOrLong){
@@ -108,7 +133,7 @@ public class NearbyStops {
 
     private ArrayList<BusStop> getListFromFile(String filename)throws IOException, ClassNotFoundException{
         FileInputStream fileInputStream = new FileInputStream(context.getFilesDir()+"/" + filename);
-        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(fileInputStream));
         ArrayList<BusStop> myList = (ArrayList<BusStop>)objectInputStream.readObject();
         return myList;
     }

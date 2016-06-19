@@ -105,6 +105,7 @@ public class SearchFragment extends Fragment {
                         case KeyEvent.KEYCODE_ENTER:
                             Intent intent = new Intent(getContext(), BusStopActivity.class);
                             intent.putExtra("number",et.getText().toString());
+                            startActivity(intent);
                             return true;
                         default:
                             break;
