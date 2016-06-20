@@ -118,6 +118,8 @@ public class NearbyFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+
         myAdapter = new ArrayAdapter<>(getContext(), R.layout.nearby_list_item, R.id.textView_nearby_item);
         nearbyListView = (ListView)getActivity().findViewById(R.id.listView_nearby);
         nearbyListView.setAdapter(myAdapter);

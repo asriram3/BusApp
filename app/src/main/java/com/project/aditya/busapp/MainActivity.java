@@ -196,48 +196,8 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             if (position == 0) {
                 return SearchFragment.newInstance("", "");
             } else if (position == 2) {
-                // Create an instance of GoogleAPIClient.
-                if (mGoogleApiClient == null) {
-                    mGoogleApiClient = new GoogleApiClient.Builder(getBaseContext())
-                            .addConnectionCallbacks((GoogleApiClient.ConnectionCallbacks) getBaseContext())
-                            .addOnConnectionFailedListener((GoogleApiClient.OnConnectionFailedListener) getBaseContext())
-                            .addApi(LocationServices.API)
-                            .build();
-                    System.out.println("Initialized mGoogleApiClient in SectionsPagerAdapter!");
-                }
-
-                if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-
-                    nearbyFragment = NearbyFragment.newInstance(-1, -1);
-                    return nearbyFragment;
-                }
-
-                //TODO
-                Location location=null;
-
-                location= LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-
-                onLocationGranted();
-
-                if(location!=null){
-                    Toast.makeText(getBaseContext(), "Location available", Toast.LENGTH_SHORT).show();
-                    nearbyFragment = NearbyFragment.newInstance(location.getLatitude(), location.getLongitude());
-                    return nearbyFragment;
-                }
-                else{
-                    Toast.makeText(getBaseContext(), "Location not availble", Toast.LENGTH_SHORT).show();
-                    nearbyFragment = NearbyFragment.newInstance(-1,-1);
-                    return nearbyFragment;
-                }
-
+                nearbyFragment = NearbyFragment.newInstance(-1,-1);
+                return nearbyFragment;
             }
             return PlaceholderFragment.newInstance(position + 1);
         }
@@ -345,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
+        onLocationGranted();
     }
 
     @Override
