@@ -1,6 +1,7 @@
 package com.project.aditya.busapp;
 
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -23,6 +24,21 @@ public class NearbyStops {
     private ArrayList<BusStop> longList;
 
 
+    public NearbyStops(Context ctxt){
+        context = ctxt;
+
+        lat = 0;
+        lng = 0;
+
+        try {
+            loadLists();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     public NearbyStops(Context ctxt, double lt, double lg){
         context = ctxt;
         lat = lt;
@@ -30,9 +46,13 @@ public class NearbyStops {
 //        lat = 1.29694570097768;
 //        lng = 103.76710295331488;
 
-        latList = null;
-        longList = null;
-
+        try {
+            loadLists();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void loadLists()throws IOException, ClassNotFoundException{
@@ -40,12 +60,21 @@ public class NearbyStops {
         longList = getListFromFile("longList.ser");
     }
 
+    public ArrayList<BusStop> getNearbyStops(Location location)throws IOException, ClassNotFoundException{
+        lat = location.getLatitude();
+        lng = location.getLongitude();
+        return getNearbyStops();
+    }
 
     public ArrayList<BusStop> getNearbyStops()throws IOException, ClassNotFoundException{
         long init = System.currentTimeMillis();
 
         if(latList == null || longList == null){
             loadLists();
+        }
+
+        if(lat==0&&lng==0){
+            return new ArrayList<BusStop>();
         }
 
 

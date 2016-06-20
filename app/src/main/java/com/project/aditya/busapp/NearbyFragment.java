@@ -44,6 +44,7 @@ public class NearbyFragment extends Fragment {
     private ListView nearbyListView;
     private Location location;
     private ArrayAdapter<String> myAdapter;
+    NearbyStops nearbyStops;
 
     private OnFragmentInteractionListener mListener;
 
@@ -77,6 +78,7 @@ public class NearbyFragment extends Fragment {
             mParam1 = getArguments().getDouble(ARG_PARAM1);
             mParam2 = getArguments().getDouble(ARG_PARAM2);
         }
+        nearbyStops = new NearbyStops(getContext());
     }
 
     @Override
@@ -101,15 +103,7 @@ public class NearbyFragment extends Fragment {
     }
 
     public void setLocation(){
-        TextView tv = (TextView)getActivity().findViewById(R.id.textView_nearby);
-        if(mParam1==-1.0 && mParam2==-1.0){
-            tv.setText("Press the floating action button!");
-            tv.setPadding(15,15,15,15);
-        }
-        else{
-//            tv.setText("Lat: "+mParam1+"; Long: "+mParam2);
-            tv.setVisibility(View.INVISIBLE);
-            tv.setPadding(0,0,0,0);
+        if(location!=null){
             FetchNearbyLocations fetchNearbyLocations = new FetchNearbyLocations();
             fetchNearbyLocations.execute(location);
         }
@@ -152,11 +146,11 @@ public class NearbyFragment extends Fragment {
 
         @Override
         protected ArrayList<BusStop> doInBackground(Location... params) {
-            NearbyStops nearby = new NearbyStops(getContext(), params[0].getLatitude(), params[0].getLongitude());
+//            NearbyStops nearby = new NearbyStops(getContext(), params[0].getLatitude(), params[0].getLongitude());
             ArrayList<BusStop> res = null;
             try {
                 long init = System.currentTimeMillis();
-                res =  nearby.getNearbyStops();
+                res =  nearbyStops.getNearbyStops(params[0]);
                 long fin = System.currentTimeMillis();
                 Log.d("BusApp Nearby", "Calculating nearby stops took " + (fin - init) + "ms");
             } catch (IOException e) {

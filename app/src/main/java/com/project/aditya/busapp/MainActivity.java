@@ -105,12 +105,8 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         if (firstTime) {
             editor.putBoolean("firstTime", false);
             editor.commit();
-            ListSetup listSetup = new ListSetup(this);
-            try {
-                listSetup.setupLists();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            DoListSetup doListSetup = new DoListSetup();
+            doListSetup.execute();
         }
 
 
@@ -224,6 +220,31 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
 
 
 
+    public class DoListSetup extends AsyncTask<Void, Integer, Void>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(getBaseContext(), "Finishing some initial setup!", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ListSetup listSetup = new ListSetup(getBaseContext());
+            try {
+                listSetup.setupLists();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Toast.makeText(getBaseContext(), "Initial Setup Complete!", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

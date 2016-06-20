@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,9 +36,20 @@ public class BusStopActivity extends AppCompatActivity {
 //        setSupportActionBar(toolbar);
 
 
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         final String num = intent.getStringExtra("number");
 
+
+        Button quickViewButton = (Button)findViewById(R.id.button_add_to_quickview);
+        assert quickViewButton != null;
+        quickViewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 = new Intent(getBaseContext(), AddToQuickViewActivity.class);
+                intent1.putExtra("number", num);
+                startActivity(intent1);
+            }
+        });
 
         if(num==null){
             Toast.makeText(BusStopActivity.this, "No such stop!", Toast.LENGTH_SHORT).show();
@@ -131,7 +143,7 @@ public class BusStopActivity extends AppCompatActivity {
                     BusTimesJsonStr = null;
                 }
                 BusTimesJsonStr = buffer.toString();
-                System.out.println(BusTimesJsonStr);
+//                System.out.println(BusTimesJsonStr);
             } catch (IOException e) {
                 Log.e("PlaceholderFragment", "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attempting
