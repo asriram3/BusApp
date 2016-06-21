@@ -28,6 +28,8 @@ import java.util.Calendar;
 
 public class BusStopActivity extends AppCompatActivity {
 
+    final ArrayList<String> serviceList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,18 +40,6 @@ public class BusStopActivity extends AppCompatActivity {
 
         final Intent intent = getIntent();
         final String num = intent.getStringExtra("number");
-
-
-        Button quickViewButton = (Button)findViewById(R.id.button_add_to_quickview);
-        assert quickViewButton != null;
-        quickViewButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent1 = new Intent(getBaseContext(), AddToQuickViewActivity.class);
-                intent1.putExtra("number", num);
-                startActivity(intent1);
-            }
-        });
 
         if(num==null){
             Toast.makeText(BusStopActivity.this, "No such stop!", Toast.LENGTH_SHORT).show();
@@ -77,15 +67,32 @@ public class BusStopActivity extends AppCompatActivity {
 
 
         stop_no.setText(num);
+        String name = null;
 
         try{
             JSONObject jsonStopInfo = new JSONObject(loadJSONFromAsset("stopInfo.json"));
-            stop_name.setText(jsonStopInfo.getJSONObject(num).getString("name"));
+            name = jsonStopInfo.getJSONObject(num).getString("name");
+            stop_name.setText(name);
         }catch (Exception e){
             e.printStackTrace();
             Toast.makeText(BusStopActivity.this, "No such stop!", Toast.LENGTH_SHORT).show();
             kill_activity();
         }
+
+        //so that it can be used in the onClick
+        final String nam = name;
+        Button quickViewButton = (Button)findViewById(R.id.button_add_to_quickview);
+        assert quickViewButton != null;
+        quickViewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 = new Intent(getBaseContext(), AddToQuickViewActivity.class);
+                intent1.putExtra("number", num);
+                intent1.putExtra("name", nam);
+                intent1.putStringArrayListExtra("serviceList", serviceList);
+                startActivity(intent1);
+            }
+        });
 
         GetBusTimes getBusTimes = new GetBusTimes();
         getBusTimes.execute(num);
@@ -112,7 +119,7 @@ public class BusStopActivity extends AppCompatActivity {
                 // Construct the URL
                 URL url = new URL("http://datamall2.mytransport.sg/ltaodataservice/BusArrival?BusStopID="+params[0]+"&SST=True");
 
-                // Create the request to OpenWeatherMap, and open the connection
+                // Create the request and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setRequestProperty("AccountKey", "QOuhOOUltXtFKtlHrRpD8A==");
@@ -146,8 +153,6 @@ public class BusStopActivity extends AppCompatActivity {
 //                System.out.println(BusTimesJsonStr);
             } catch (IOException e) {
                 Log.e("PlaceholderFragment", "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attempting
-                // to parse it.
                 BusTimesJsonStr = null;
             } finally{
                 if (urlConnection != null) {
@@ -186,6 +191,7 @@ public class BusStopActivity extends AppCompatActivity {
                 for(int i = 0; i<busTimes.size(); i++){
                     System.out.println("Bus no: "+busTimes.get(i).getNum()
                             +" Time1: "+busTimes.get(i).getT1()+" Time2: "+busTimes.get(i).getT2());
+                    serviceList.add(busTimes.get(i).getNum());
                 }
 
                 ListView lv = (ListView) findViewById(R.id.services_at_stop);
