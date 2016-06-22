@@ -74,7 +74,7 @@ public class NearbyStops {
         }
 
         if(lat==0&&lng==0){
-            return new ArrayList<BusStop>();
+            return new ArrayList<>();
         }
 
 

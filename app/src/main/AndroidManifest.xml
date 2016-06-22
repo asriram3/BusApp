@@ -34,7 +34,7 @@
             android:name=".AddToQuickViewActivity"
             android:label="@string/title_activity_add_to_quick_view"
             android:parentActivityName=".BusStopActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/Theme.Design.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.project.aditya.busapp.BusStopActivity" />
