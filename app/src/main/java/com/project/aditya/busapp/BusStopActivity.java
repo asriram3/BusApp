@@ -51,8 +51,8 @@ public class BusStopActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Refreshing", Snackbar.LENGTH_SHORT)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Refreshing", Snackbar.LENGTH_SHORT)
+//                        .setAction("Action", null).show();
 
                 GetBusTimes getBusTimes = new GetBusTimes();
                 getBusTimes.execute(num);

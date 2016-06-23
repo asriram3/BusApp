@@ -67,7 +67,7 @@ public class NearbyStops {
     }
 
     public ArrayList<BusStop> getNearbyStops()throws IOException, ClassNotFoundException{
-        long init = System.currentTimeMillis();
+//        long init = System.currentTimeMillis();
 
         if(latList == null || longList == null){
             loadLists();
@@ -78,8 +78,8 @@ public class NearbyStops {
         }
 
 
-        System.out.println("Time to get file: " + (System.currentTimeMillis()-init));
-        init = System.currentTimeMillis();
+//        System.out.println("Time to get file: " + (System.currentTimeMillis()-init));
+//        init = System.currentTimeMillis();
 
 //        for(int i = 0; i<25; i++){
 //            System.out.println(longList.get(i).num + "  long: " + longList.get(i).lng);
@@ -92,21 +92,21 @@ public class NearbyStops {
         int longmin = getIndex((lng-0.009), 1);
         int longmax = getIndex((lng+0.009), 1);
 
-        System.out.println("Time to get border locations: " + (System.currentTimeMillis()-init));
-        init = System.currentTimeMillis();
+//        System.out.println("Time to get border locations: " + (System.currentTimeMillis()-init));
+//        init = System.currentTimeMillis();
 
         ArrayList<BusStop> final_list = getListFromIndices(latmin, latmax, longmin, longmax);
 
-        System.out.println("Time to get final list: " + (System.currentTimeMillis()-init));
-        init = System.currentTimeMillis();
+//        System.out.println("Time to get final list: " + (System.currentTimeMillis()-init));
+//        init = System.currentTimeMillis();
 
         Collections.sort(final_list, BusStop.distComparator);
 
-        System.out.println("Time to sort final list: " + (System.currentTimeMillis()-init));
+//        System.out.println("Time to sort final list: " + (System.currentTimeMillis()-init));
 
-        for(int i = 0; i< final_list.size(); i++){
-            Log.d("BusApp Nearby", "No: "+final_list.get(i).num+" Name: "+final_list.get(i).name+" Dist: "+final_list.get(i).distance);
-        }
+//        for(int i = 0; i< final_list.size(); i++){
+//            Log.d("BusApp Nearby", "No: "+final_list.get(i).num+" Name: "+final_list.get(i).name+" Dist: "+final_list.get(i).distance);
+//        }
 
         return final_list;
     }

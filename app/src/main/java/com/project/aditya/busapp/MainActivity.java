@@ -43,8 +43,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
-        NearbyFragment.OnFragmentInteractionListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        NearbyFragment.OnFragmentInteractionListener, QuickViewFragment.OnFragmentInteractionListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            Toast.makeText(MainActivity.this, "No permissions", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(MainActivity.this, "No permissions", Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             return;
@@ -175,6 +175,11 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             nearbyFragment.setLocation(location);
     }
 
+    @Override
+    public void onFragmentInteraction3(Uri uri) {
+
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -191,6 +196,8 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             // Return a PlaceholderFragment (defined as a static inner class below).
             if (position == 0) {
                 return SearchFragment.newInstance("", "");
+            } else if(position == 1){
+                return QuickViewFragment.newInstance("", "");
             } else if (position == 2) {
                 nearbyFragment = NearbyFragment.newInstance(-1,-1);
                 return nearbyFragment;

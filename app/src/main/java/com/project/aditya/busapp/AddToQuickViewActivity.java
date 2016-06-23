@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -50,6 +51,8 @@ public class AddToQuickViewActivity extends AppCompatActivity {
 
         ListView serviceListView = (ListView)findViewById(R.id.listView_ATQuickView);
 //        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.quickview_list_item, R.id.textView_ATQuickView_service, serviceList);
+//        serviceListView.setAdapter(arrayAdapter);
+
         assert serviceListView != null;
         final MyCustomAdapter myCustomAdapter = new MyCustomAdapter(this, R.layout.quickview_list_item, R.id.textView_ATQuickView_service, serviceList);
         serviceListView.setAdapter(myCustomAdapter);
@@ -70,7 +73,7 @@ public class AddToQuickViewActivity extends AppCompatActivity {
                     }
                 }
 
-                Toast.makeText(AddToQuickViewActivity.this, resposeText, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(AddToQuickViewActivity.this, resposeText, Toast.LENGTH_SHORT).show();
 
                 addQuickView(stop_number, arrayList);
             }
@@ -79,28 +82,26 @@ public class AddToQuickViewActivity extends AppCompatActivity {
     }
 
     public void addQuickView(String num, ArrayList<Service> services){
-        SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        int count= 0;
-
-        for(Service serv : services){
-            if(serv.getSelected())
-                count++;
-        }
-
         Set<String> mySet = new HashSet<>();
-        String[] busses = new String[count];
-        int i = 0;
         for(Service serv : services){
             if(serv.getSelected()){
                 mySet.add(serv.getNumber());
-                busses[i] = serv.getNumber();
-                i++;
             }
         }
-
         editor.putStringSet(num, mySet);
+
+        Set<String> stops = sharedPreferences.getStringSet("stops", null);
+        if(stops==null){
+            stops = new HashSet<>();
+        }
+        if(!stops.contains(num)){
+            stops.add(num);
+            Toast.makeText(AddToQuickViewActivity.this, "Stop "+num+" was added to shared Preferences", Toast.LENGTH_SHORT).show();
+        }
+        editor.putStringSet("stops", stops);
+
         editor.commit();
     }
 
@@ -113,7 +114,7 @@ public class AddToQuickViewActivity extends AppCompatActivity {
             super(context, resource, textViewResourceId, objects);
             this.serList = new ArrayList<>();
 
-            SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             Set<String> mySet = sharedPreferences.getStringSet(stop_num, null);
 
             for(String str : objects){
