@@ -25,14 +25,13 @@ import java.util.Set;
 /**
  * Created by Aditya on 23/6/2016.
  */
-public class QuickListAdapter extends ArrayAdapter<String> {
+public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTimes.onReceivedBusTimes{
 
     List<String> myList;
     JSONObject stopInfo;
     boolean[] shown;
-
-    float low = 10;
-    float high = 20;
+    List<ArrayList<BusTimes>> quickTimesList;
+    private int currPos;
 
     public QuickListAdapter(Context context, int resource, List<String> items){
         super(context, resource, items);
@@ -53,6 +52,7 @@ public class QuickListAdapter extends ArrayAdapter<String> {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent){
         View v = convertView;
+        currPos = position;
 
         final LayoutInflater li = LayoutInflater.from(getContext());
         if(v == null){
@@ -72,9 +72,6 @@ public class QuickListAdapter extends ArrayAdapter<String> {
         String stop = stop_num + " - " + stop_name;
         final TextView stopText = (TextView)v.findViewById(R.id.textView_quickStop);
         stopText.setText(stop);
-        if(Build.VERSION.SDK_INT>=21){
-//            stopText.setElevation(low);
-        }
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
         Set<String> servicesSet = sharedPreferences.getStringSet(stop_num, null);
@@ -84,20 +81,12 @@ public class QuickListAdapter extends ArrayAdapter<String> {
         final LinearLayout serviceLayout = (LinearLayout)v.findViewById(R.id.LLquickServices);
         serviceLayout.removeAllViews();
 
-        if(shown[position] && Build.VERSION.SDK_INT>=21){
-            System.out.println("View at position " + position + " was set to high");
-//            stopText.setElevation(0);
-        }
-
         if(shown[position]){
             for(String str : services){
                 View child = li.inflate(R.layout.simple_list_item, null);
 
                 TextView tv = (TextView) child.findViewById(R.id.textView_simple);
                 tv.setText(str);
-
-                if(Build.VERSION.SDK_INT>=21)
-                    tv.setElevation(low);
 
                 serviceLayout.addView(child);
             }
@@ -109,26 +98,14 @@ public class QuickListAdapter extends ArrayAdapter<String> {
             public void onClick(View v) {
                 if(shown[position]){
                     serviceLayout.removeAllViews();
-
-                    if(Build.VERSION.SDK_INT>=21)
-                        stopText.setElevation(low);
-
                     shown[position] = false;
                 }
                 else{
-
-                    if(Build.VERSION.SDK_INT>=21)
-                        stopText.setElevation(high);
-
                     for(String str : services){
                         View child = li.inflate(R.layout.simple_list_item, null);
 
                         TextView tv = (TextView) child.findViewById(R.id.textView_simple);
                         tv.setText(str);
-
-                        if(Build.VERSION.SDK_INT>=21)
-                            tv.setElevation(low);
-
                         serviceLayout.addView(child);
                     }
                     shown[position] = true;
@@ -137,6 +114,11 @@ public class QuickListAdapter extends ArrayAdapter<String> {
         });
 
         return v;
+    }
+
+    @Override
+    public void onReceived(ArrayList<BusTimes> busTimes) {
+
     }
 
     public String loadJSONFromAsset(String filename) {
@@ -154,4 +136,5 @@ public class QuickListAdapter extends ArrayAdapter<String> {
         }
         return json;
     }
+
 }

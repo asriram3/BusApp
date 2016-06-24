@@ -1,5 +1,6 @@
 package com.project.aditya.busapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,9 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class BusStopActivity extends AppCompatActivity {
-
-    final ArrayList<String> serviceList = new ArrayList<>();
+public class BusStopActivity extends AppCompatActivity implements GetBusTimes.onReceivedBusTimes {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +39,7 @@ public class BusStopActivity extends AppCompatActivity {
 
         final Intent intent = getIntent();
         final String num = intent.getStringExtra("number");
+        final Context thisContext = this;
 
         if(num==null){
             Toast.makeText(BusStopActivity.this, "No such stop!", Toast.LENGTH_SHORT).show();
@@ -47,17 +47,7 @@ public class BusStopActivity extends AppCompatActivity {
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        assert fab != null;
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Snackbar.make(view, "Refreshing", Snackbar.LENGTH_SHORT)
-//                        .setAction("Action", null).show();
 
-                GetBusTimes getBusTimes = new GetBusTimes();
-                getBusTimes.execute(num);
-            }
-        });
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
@@ -83,24 +73,45 @@ public class BusStopActivity extends AppCompatActivity {
         final String nam = name;
         Button quickViewButton = (Button)findViewById(R.id.button_add_to_quickview);
         assert quickViewButton != null;
+
+        final GetBusTimes getBusTimes = new GetBusTimes(this);
+        getBusTimes.execute(num);
+
         quickViewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent1 = new Intent(getBaseContext(), AddToQuickViewActivity.class);
                 intent1.putExtra("number", num);
                 intent1.putExtra("name", nam);
-                intent1.putStringArrayListExtra("serviceList", serviceList);
+                intent1.putStringArrayListExtra("serviceList", getBusTimes.serviceList);
                 startActivity(intent1);
             }
         });
-
-        GetBusTimes getBusTimes = new GetBusTimes();
-        getBusTimes.execute(num);
+        assert fab != null;
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Snackbar.make(view, "Refreshing", Snackbar.LENGTH_SHORT)
+//                        .setAction("Action", null).show();
+                GetBusTimes getBusTimes1 = new GetBusTimes(thisContext);
+                getBusTimes1.execute(num);
+            }
+        });
 
     }
 
+    @Override
+    public void onReceived(ArrayList<BusTimes> busTimes) {
+        ListView lv = (ListView) findViewById(R.id.services_at_stop);
+        ListAdapter mAdapter = new ListAdapter(getBaseContext(), R.layout.service_time_layout_list_item, busTimes);
+        assert lv != null;
+        lv.setAdapter(mAdapter);
+    }
 
+/*
     public class GetBusTimes extends AsyncTask<String, Void, ArrayList<BusTimes>>{
+
+        public final ArrayList<String> serviceList = new ArrayList<>();
 
         @Override
         protected ArrayList doInBackground(String... params) {
@@ -246,7 +257,7 @@ public class BusStopActivity extends AppCompatActivity {
             return  minute;
         }
     }
-
+*/
 
     public void kill_activity(){
         finish();
