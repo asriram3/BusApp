@@ -2,6 +2,7 @@ package com.project.aditya.busapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,10 +29,20 @@ public class QuickListAdapter extends ArrayAdapter<String> {
 
     List<String> myList;
     JSONObject stopInfo;
+    boolean[] shown;
+
+    float low = 10;
+    float high = 20;
 
     public QuickListAdapter(Context context, int resource, List<String> items){
         super(context, resource, items);
         myList = items;
+        shown = new boolean[items.size()];
+        shown[0] = true;
+        shown[1] = true;
+        for(int i = 2; i<items.size(); i++){
+            shown[i] = false;
+        }
         try{
             stopInfo = new JSONObject(loadJSONFromAsset("stopInfo.json"));
         }catch (Exception e){
@@ -40,10 +51,10 @@ public class QuickListAdapter extends ArrayAdapter<String> {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent){
+    public View getView(final int position, View convertView, ViewGroup parent){
         View v = convertView;
 
-        LayoutInflater li = LayoutInflater.from(getContext());
+        final LayoutInflater li = LayoutInflater.from(getContext());
         if(v == null){
             v = li.inflate(R.layout.quickview_stop_item, null);
         }
@@ -59,25 +70,71 @@ public class QuickListAdapter extends ArrayAdapter<String> {
         }
 
         String stop = stop_num + " - " + stop_name;
-        TextView stopText = (TextView)v.findViewById(R.id.textView_quickStop);
+        final TextView stopText = (TextView)v.findViewById(R.id.textView_quickStop);
         stopText.setText(stop);
+        if(Build.VERSION.SDK_INT>=21){
+//            stopText.setElevation(low);
+        }
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
         Set<String> servicesSet = sharedPreferences.getStringSet(stop_num, null);
-        ArrayList<String> services = new ArrayList<>();
+        final ArrayList<String> services = new ArrayList<>();
         services.addAll(servicesSet);
 
-        LinearLayout serviceLayout = (LinearLayout)v.findViewById(R.id.LLquickServices);
+        final LinearLayout serviceLayout = (LinearLayout)v.findViewById(R.id.LLquickServices);
         serviceLayout.removeAllViews();
 
-        for(String str : services){
-            View child = li.inflate(R.layout.simple_list_item, null);
-
-            TextView tv = (TextView) child.findViewById(R.id.textView_simple);
-            tv.setText(str);
-
-            serviceLayout.addView(child);
+        if(shown[position] && Build.VERSION.SDK_INT>=21){
+            System.out.println("View at position " + position + " was set to high");
+//            stopText.setElevation(0);
         }
+
+        if(shown[position]){
+            for(String str : services){
+                View child = li.inflate(R.layout.simple_list_item, null);
+
+                TextView tv = (TextView) child.findViewById(R.id.textView_simple);
+                tv.setText(str);
+
+                if(Build.VERSION.SDK_INT>=21)
+                    tv.setElevation(low);
+
+                serviceLayout.addView(child);
+            }
+        }
+
+
+        stopText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(shown[position]){
+                    serviceLayout.removeAllViews();
+
+                    if(Build.VERSION.SDK_INT>=21)
+                        stopText.setElevation(low);
+
+                    shown[position] = false;
+                }
+                else{
+
+                    if(Build.VERSION.SDK_INT>=21)
+                        stopText.setElevation(high);
+
+                    for(String str : services){
+                        View child = li.inflate(R.layout.simple_list_item, null);
+
+                        TextView tv = (TextView) child.findViewById(R.id.textView_simple);
+                        tv.setText(str);
+
+                        if(Build.VERSION.SDK_INT>=21)
+                            tv.setElevation(low);
+
+                        serviceLayout.addView(child);
+                    }
+                    shown[position] = true;
+                }
+            }
+        });
 
         return v;
     }

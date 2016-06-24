@@ -40,6 +40,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
+import java.security.spec.ECField;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener,
@@ -62,7 +63,9 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     private ViewPager mViewPager;
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1234;
     GoogleApiClient mGoogleApiClient;
+
     private NearbyFragment nearbyFragment = null;
+    private QuickViewFragment quickViewFragment = null;
 
 
     @Override
@@ -125,6 +128,14 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if(quickViewFragment!=null)
+            quickViewFragment.refresh();
+        onLocationGranted();
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 //        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
@@ -165,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         if (location == null) {
-            Toast.makeText(MainActivity.this, "Location not available", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(MainActivity.this, "Location not available", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -173,6 +184,12 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
 
         if(nearbyFragment!=null)
             nearbyFragment.setLocation(location);
+        try{
+            if(quickViewFragment!=null)
+                quickViewFragment.setLocation(location);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -197,7 +214,8 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             if (position == 0) {
                 return SearchFragment.newInstance("", "");
             } else if(position == 1){
-                return QuickViewFragment.newInstance("", "");
+                quickViewFragment = QuickViewFragment.newInstance("","");
+                return quickViewFragment;
             } else if (position == 2) {
                 nearbyFragment = NearbyFragment.newInstance(-1,-1);
                 return nearbyFragment;

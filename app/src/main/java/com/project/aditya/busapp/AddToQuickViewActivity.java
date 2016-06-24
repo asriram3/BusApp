@@ -65,17 +65,9 @@ public class AddToQuickViewActivity extends AppCompatActivity {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 ArrayList<Service> arrayList = myCustomAdapter.serList;
-                StringBuffer resposeText = new StringBuffer();
-                resposeText.append("The following services were selected: \n");
-                for(Service ser : arrayList){
-                    if(ser.getSelected()){
-                        resposeText.append( "\n" + ser.getNumber());
-                    }
-                }
-
-                //Toast.makeText(AddToQuickViewActivity.this, resposeText, Toast.LENGTH_SHORT).show();
-
                 addQuickView(stop_number, arrayList);
+
+                kill_activity();
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -85,12 +77,18 @@ public class AddToQuickViewActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Set<String> mySet = new HashSet<>();
+        boolean none_selected = true;
         for(Service serv : services){
             if(serv.getSelected()){
+                none_selected = false;
                 mySet.add(serv.getNumber());
             }
         }
-        editor.putStringSet(num, mySet);
+        if(!mySet.isEmpty()){
+            editor.putStringSet(num, mySet);
+        }
+
+
 
         Set<String> stops = sharedPreferences.getStringSet("stops", null);
         if(stops==null){
@@ -98,11 +96,18 @@ public class AddToQuickViewActivity extends AppCompatActivity {
         }
         if(!stops.contains(num)){
             stops.add(num);
-            Toast.makeText(AddToQuickViewActivity.this, "Stop "+num+" was added to shared Preferences", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(AddToQuickViewActivity.this, "Stop "+num+" was added to shared Preferences", Toast.LENGTH_SHORT).show();
+        }
+        if(none_selected){
+            stops.remove(num);
         }
         editor.putStringSet("stops", stops);
 
         editor.commit();
+    }
+
+    public void kill_activity(){
+        finish();
     }
 
     private class MyCustomAdapter extends ArrayAdapter<String> {
@@ -135,7 +140,7 @@ public class AddToQuickViewActivity extends AppCompatActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
 
             ViewHolder holder = null;
-            Log.v("ConvertView", String.valueOf(position));
+//            Log.v("ConvertView", String.valueOf(position));
 
             if (convertView == null) {
                 LayoutInflater vi = (LayoutInflater)getSystemService(

@@ -2,6 +2,7 @@ package com.project.aditya.busapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -14,7 +15,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,6 +45,8 @@ public class QuickViewFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private JSONObject jsonObject;
 
     public QuickViewFragment() {
         // Required empty public constructor
@@ -67,6 +76,11 @@ public class QuickViewFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+        try{
+            jsonObject = new JSONObject(loadJSONFromAsset("stopInfo.json"));
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -99,6 +113,14 @@ public class QuickViewFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        refresh();
+    }
+
+    private ArrayList<String> stopList;
+    private QuickListAdapter quickListAdapter;
+
+    public void refresh(){
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         Set<String> stops = sharedPreferences.getStringSet("stops", new HashSet<String>());
 
@@ -107,13 +129,33 @@ public class QuickViewFragment extends Fragment {
             return;
         }
 
-        ArrayList<String> stopList = new ArrayList<>();
+        stopList = new ArrayList<>();
         stopList.addAll(stops);
 
         ListView quickStopList = (ListView) getActivity().findViewById(R.id.listView_quickView);
-        QuickListAdapter quickListAdapter = new QuickListAdapter(getContext(), R.layout.quickview_stop_item, stopList);
+        quickListAdapter = new QuickListAdapter(getContext(), R.layout.quickview_stop_item, stopList);
         quickStopList.setAdapter(quickListAdapter);
+    }
 
+    public void setLocation(Location location)throws JSONException{
+        ArrayList<BusStop> busStops = new ArrayList<>();
+        for(String str : stopList){
+            JSONObject stopInfo = jsonObject.getJSONObject(str);
+            String name = stopInfo.getString("name");
+            String num = stopInfo.getString("no");
+            double lat = stopInfo.getDouble("lat");
+            double lng = stopInfo.getDouble("lng");
+            BusStop busStop = new BusStop(num, name, lat, lng);
+            busStop.setDistance(location.getLatitude(), location.getLongitude());
+            busStops.add(busStop);
+        }
+        Collections.sort(busStops, BusStop.distComparator);
+
+        quickListAdapter.clear();
+        for(BusStop busStop: busStops){
+            quickListAdapter.add(busStop.num);
+        }
+        quickListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -135,5 +177,21 @@ public class QuickViewFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction3(Uri uri);
+    }
+
+    public String loadJSONFromAsset(String filename) {
+        String json = null;
+        try {
+            InputStream is = getActivity().getAssets().open(filename);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
     }
 }
