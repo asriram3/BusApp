@@ -39,7 +39,7 @@ public class BusStopActivity extends AppCompatActivity implements GetBusTimes.on
 
         final Intent intent = getIntent();
         final String num = intent.getStringExtra("number");
-        final Context thisContext = this;
+        final GetBusTimes.onReceivedBusTimes thisContext = this;
 
         if(num==null){
             Toast.makeText(BusStopActivity.this, "No such stop!", Toast.LENGTH_SHORT).show();
@@ -107,7 +107,7 @@ public class BusStopActivity extends AppCompatActivity implements GetBusTimes.on
         assert lv != null;
         lv.setAdapter(mAdapter);
     }
-    
+
 
     public void kill_activity(){
         finish();
