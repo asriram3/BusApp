@@ -25,20 +25,18 @@ import java.util.Set;
 /**
  * Created by Aditya on 23/6/2016.
  */
-public class QuickListAdapter extends ArrayAdapter<String>{
+public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTimes.onReceivedBusTimes{
 
     List<String> myList;
     JSONObject stopInfo;
     boolean[] shown;
-    public static ArrayList<BusTimes>[] quickTimesList;
-    Context context;
+    List<ArrayList<BusTimes>> quickTimesList;
+    private int currPos;
 
     public QuickListAdapter(Context context, int resource, List<String> items){
         super(context, resource, items);
-        this.context = context;
         myList = items;
         shown = new boolean[items.size()];
-        quickTimesList = new ArrayList[items.size()];
         shown[0] = true;
         shown[1] = true;
         for(int i = 2; i<items.size(); i++){
@@ -51,82 +49,17 @@ public class QuickListAdapter extends ArrayAdapter<String>{
         }
     }
 
-    public class BusTimesUpdater implements GetBusTimes.onReceivedBusTimes{
-
-        private int myPos;
-        ArrayList<String> myServices;
-        LinearLayout myLayout;
-        LayoutInflater li;
-        public BusTimesUpdater(int p, ArrayList<String> services, LinearLayout myLayout, LayoutInflater layoutInflater){
-            myPos = p;
-            myServices = services;
-            this.myLayout = myLayout;
-            li = layoutInflater;
-        }
-
-        @Override
-        public void onReceived(ArrayList<BusTimes> busTimes) {
-            ArrayList<BusTimes> toRemove = new ArrayList<>();
-            for(int i = 0; i<busTimes.size(); i++){
-                if(!myServices.contains(busTimes.get(i).getNum())){
-                    toRemove.add(busTimes.get(i));
-                }
-            }
-            for(BusTimes busTimes1 : toRemove){
-                busTimes.remove(busTimes1);
-            }
-
-            quickTimesList[myPos] = busTimes;
-
-            for(BusTimes x : busTimes){
-                addServiceChildToLayout(x, myLayout, li);
-            }
-        }
-    }
-
-    public void addServiceChildToLayout(BusTimes x, LinearLayout myLayout, LayoutInflater li){
-        View child = li.inflate(R.layout.service_time_layout_list_item, null);
-
-        TextView tv1 = (TextView) child.findViewById(R.id.service_no);
-        TextView tv2 = (TextView) child.findViewById(R.id.time_one);
-        TextView tv3 = (TextView) child.findViewById(R.id.time_two);
-
-        tv1.setText(x.getNum());
-
-        if(x.getT1()>0)
-            tv2.setText(""+x.getT1());
-        else if(x.getT1()<=0 && x.getT1()>-3){
-            tv2.setText("Arr");
-        }
-        else if(x.getT1()<-2){
-            tv2.setText("No ETA");
-        }
-
-        if(x.getT2()>0){
-            tv3.setText(""+x.getT2());
-        }
-        else{
-            tv3.setText("No ETA");
-        }
-
-        if(x.getT1()<0 && x.getT2()<0){
-            tv2.setText("No");
-            tv3.setText("ETA");
-        }
-
-        myLayout.addView(child);
-    }
-
     @Override
     public View getView(final int position, View convertView, ViewGroup parent){
         View v = convertView;
+        currPos = position;
 
         final LayoutInflater li = LayoutInflater.from(getContext());
         if(v == null){
             v = li.inflate(R.layout.quickview_stop_item, null);
         }
 
-        final String stop_num = myList.get(position);
+        String stop_num = myList.get(position);
         if(stop_num==null){return v;}
 
         String stop_name = "";
@@ -149,18 +82,14 @@ public class QuickListAdapter extends ArrayAdapter<String>{
         serviceLayout.removeAllViews();
 
         if(shown[position]){
-            if(quickTimesList[position]==null){
-                GetBusTimes getBusTimes = new GetBusTimes(new BusTimesUpdater(position, services, serviceLayout, li));
-                getBusTimes.execute(stop_num);
+            for(String str : services){
+                View child = li.inflate(R.layout.simple_list_item, null);
+
+                TextView tv = (TextView) child.findViewById(R.id.textView_simple);
+                tv.setText(str);
+
+                serviceLayout.addView(child);
             }
-//            for(String str : services){
-//                View child = li.inflate(R.layout.simple_list_item, null);
-//
-//                TextView tv = (TextView) child.findViewById(R.id.textView_simple);
-//                tv.setText(str);
-//
-//                serviceLayout.addView(child);
-//            }
         }
 
 
@@ -172,22 +101,12 @@ public class QuickListAdapter extends ArrayAdapter<String>{
                     shown[position] = false;
                 }
                 else{
-//                    for(String str : services){
-//                        View child = li.inflate(R.layout.simple_list_item, null);
-//
-//                        TextView tv = (TextView) child.findViewById(R.id.textView_simple);
-//                        tv.setText(str);
-//                        serviceLayout.addView(child);
-//                    }
-                    if(quickTimesList[position]==null){
-                        GetBusTimes getBusTimes = new GetBusTimes(new BusTimesUpdater(position, services, serviceLayout, li));
-                        getBusTimes.execute(stop_num);
-                    }
-                    else{
-                        ArrayList<BusTimes> busTimes = quickTimesList[position];
-                        for(BusTimes busTimes1 : busTimes){
-                            addServiceChildToLayout(busTimes1, serviceLayout, li);
-                        }
+                    for(String str : services){
+                        View child = li.inflate(R.layout.simple_list_item, null);
+
+                        TextView tv = (TextView) child.findViewById(R.id.textView_simple);
+                        tv.setText(str);
+                        serviceLayout.addView(child);
                     }
                     shown[position] = true;
                 }
@@ -197,6 +116,10 @@ public class QuickListAdapter extends ArrayAdapter<String>{
         return v;
     }
 
+    @Override
+    public void onReceived(ArrayList<BusTimes> busTimes) {
+
+    }
 
     public String loadJSONFromAsset(String filename) {
         String json = null;

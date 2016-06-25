@@ -22,9 +22,9 @@ import java.util.Calendar;
 public class GetBusTimes extends AsyncTask<String, Void, ArrayList<BusTimes>> {
 
     public final ArrayList<String> serviceList = new ArrayList<>();
-    private onReceivedBusTimes context;
+    private Context context;
 
-    public GetBusTimes(onReceivedBusTimes ctxt){
+    public GetBusTimes(Context ctxt){
         super();
         context = ctxt;
     }
