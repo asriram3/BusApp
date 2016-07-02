@@ -1,14 +1,19 @@
 package com.project.aditya.busapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -59,7 +64,7 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
             v = li.inflate(R.layout.quickview_stop_item, null);
         }
 
-        String stop_num = myList.get(position);
+        final String stop_num = myList.get(position);
         if(stop_num==null){return v;}
 
         String stop_name = "";
@@ -92,12 +97,26 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
             }
         }
 
-
         stopText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), BusStopActivity.class);
+                intent.putExtra("number", stop_num);
+                getContext().startActivity(intent);
+            }
+        });
+
+
+        final ImageButton stopButton = (ImageButton)v.findViewById(R.id.button_quickStop);
+        if(shown[position]){
+            stopButton.setImageResource(android.R.drawable.arrow_up_float);
+        }
+        stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(shown[position]){
                     serviceLayout.removeAllViews();
+                    stopButton.setImageResource(android.R.drawable.arrow_down_float);
                     shown[position] = false;
                 }
                 else{
@@ -108,6 +127,7 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
                         tv.setText(str);
                         serviceLayout.addView(child);
                     }
+                    stopButton.setImageResource(android.R.drawable.arrow_up_float);
                     shown[position] = true;
                 }
             }

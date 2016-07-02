@@ -173,6 +173,16 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             return;
         }
 
+        if(mGoogleApiClient==null){
+            System.out.println("mGoogleApiClient was null in onLocationGranted()");
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+            return;
+        }
+
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         if (location == null) {

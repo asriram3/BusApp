@@ -14,13 +14,28 @@
         android:layout_marginRight="15dp">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Large Text"
             android:id="@+id/textView_quickStop"
-            android:layout_weight="4"
+            android:layout_weight="2"
             android:padding="15dp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/button_quickStop"
+            android:src="@android:drawable/arrow_down_float"
+            android:background="@color/accent_material_light"
+            android:padding="20dp" />
 
     </LinearLayout>
 
@@ -32,6 +47,6 @@
         android:id="@+id/LLquickServices"
         android:elevation="15dp"
         android:background="@color/accent_material_dark"
-        android:layout_marginRight="15dp"></LinearLayout>
+        android:layout_marginRight="17dp"></LinearLayout>
 
 </LinearLayout>
