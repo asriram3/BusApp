@@ -66,8 +66,6 @@ public class AddToQuickViewActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
                 ArrayList<Service> arrayList = myCustomAdapter.serList;
                 addQuickView(stop_number, arrayList);
-
-                kill_activity();
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -100,10 +98,14 @@ public class AddToQuickViewActivity extends AppCompatActivity {
         }
         if(none_selected){
             stops.remove(num);
+            editor.remove(num);
+            System.out.println(num +" removed from list");
         }
         editor.putStringSet("stops", stops);
 
         editor.commit();
+
+        kill_activity();
     }
 
     public void kill_activity(){

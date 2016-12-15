@@ -14,6 +14,7 @@ public class BusStop implements Serializable {
     public double lng;
     public double distance;
     private double R;
+    private static final long serialVersionUID = -4523420843013848562L;
 
     public BusStop(String no, String nam, double lt, double lg){
         num = no;

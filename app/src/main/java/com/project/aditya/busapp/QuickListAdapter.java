@@ -35,8 +35,6 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
     List<String> myList;
     JSONObject stopInfo;
     boolean[] shown;
-    List<ArrayList<BusTimes>> quickTimesList;
-    private int currPos;
 
     public QuickListAdapter(Context context, int resource, List<String> items){
         super(context, resource, items);
@@ -57,7 +55,6 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
     @Override
     public View getView(final int position, View convertView, ViewGroup parent){
         View v = convertView;
-        currPos = position;
 
         final LayoutInflater li = LayoutInflater.from(getContext());
         if(v == null){
@@ -140,7 +137,6 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
     public void onReceived(ArrayList<BusTimes> busTimes) {
 
     }
-
     public String loadJSONFromAsset(String filename) {
         String json = null;
         try {

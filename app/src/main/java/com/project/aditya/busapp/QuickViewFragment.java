@@ -151,6 +151,10 @@ public class QuickViewFragment extends Fragment {
         }
         Collections.sort(busStops, BusStop.distComparator);
 
+        if(quickListAdapter==null){
+            return;
+        }
+
         quickListAdapter.clear();
         for(BusStop busStop: busStops){
             quickListAdapter.add(busStop.num);

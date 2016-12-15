@@ -7,7 +7,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/accent_material_light"
+        android:background="@color/dark"
         android:elevation="20dp"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="15dp"
@@ -34,7 +34,7 @@
             android:layout_height="match_parent"
             android:id="@+id/button_quickStop"
             android:src="@android:drawable/arrow_down_float"
-            android:background="@color/accent_material_light"
+            android:background="@color/dark"
             android:padding="20dp" />
 
     </LinearLayout>
@@ -46,7 +46,7 @@
         android:layout_marginLeft="25dp"
         android:id="@+id/LLquickServices"
         android:elevation="15dp"
-        android:background="@color/accent_material_dark"
+        android:background="@color/light"
         android:layout_marginRight="17dp"></LinearLayout>
 
 </LinearLayout>

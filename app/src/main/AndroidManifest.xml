@@ -10,12 +10,12 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Design.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,7 +26,7 @@
             android:name=".BusStopActivity"
             android:label="@string/title_activity_bus_stop"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.Design.NoActionBar">
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.project.aditya.busapp.MainActivity" />
@@ -35,7 +35,7 @@
             android:name=".AddToQuickViewActivity"
             android:label="@string/title_activity_add_to_quick_view"
             android:parentActivityName=".BusStopActivity"
-            android:theme="@style/Theme.Design.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.project.aditya.busapp.BusStopActivity" />

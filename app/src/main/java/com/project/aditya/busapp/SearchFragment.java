@@ -2,10 +2,12 @@ package com.project.aditya.busapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,6 +87,10 @@ public class SearchFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         final Button b = (Button)getActivity().findViewById(R.id.button_search);
         final EditText et = (EditText)getActivity().findViewById(R.id.editText_search);
+
+//        b.getBackground().setColorFilter(0xFFF5634A, PorterDuff.Mode.MULTIPLY);
+        b.getBackground().setColorFilter(ContextCompat.getColor(getContext(), R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
+
 
         b.setOnClickListener(new View.OnClickListener() {
             @Override

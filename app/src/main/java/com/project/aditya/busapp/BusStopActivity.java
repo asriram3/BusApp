@@ -2,10 +2,12 @@ package com.project.aditya.busapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -72,6 +74,8 @@ public class BusStopActivity extends AppCompatActivity implements GetBusTimes.on
         //so that it can be used in the onClick
         final String nam = name;
         Button quickViewButton = (Button)findViewById(R.id.button_add_to_quickview);
+        quickViewButton.getBackground().setColorFilter(ContextCompat.getColor(getBaseContext(), R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
+
         assert quickViewButton != null;
 
         final GetBusTimes getBusTimes = new GetBusTimes(this);
