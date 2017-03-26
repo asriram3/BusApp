@@ -97,8 +97,8 @@ public class BusStopActivity extends AppCompatActivity implements GetBusTimes.on
             public void onClick(View view) {
 //                Snackbar.make(view, "Refreshing", Snackbar.LENGTH_SHORT)
 //                        .setAction("Action", null).show();
-                GetBusTimes getBusTimes1 = new GetBusTimes(thisContext);
-                getBusTimes1.execute(num);
+//                GetBusTimes getBusTimes1 = new GetBusTimes(thisContext);
+                getBusTimes.execute(num);
             }
         });
 

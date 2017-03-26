@@ -41,8 +41,7 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
         myList = items;
         shown = new boolean[items.size()];
         shown[0] = true;
-        shown[1] = true;
-        for(int i = 2; i<items.size(); i++){
+        for(int i = 1; i<items.size(); i++){
             shown[i] = false;
         }
         try{
