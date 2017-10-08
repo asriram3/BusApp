@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:text="143"
         android:id="@+id/service_no"
+        android:paddingLeft="10dp"
         android:layout_weight="2"
         android:textSize="45dp" />
 
@@ -18,7 +19,8 @@
         android:text="2"
         android:id="@+id/time_one"
         android:layout_weight="1"
-        android:textSize="40dp" />
+        android:textSize="40dp"
+        android:textAlignment="center" />
 
     <TextView
         android:layout_width="0dp"
@@ -26,6 +28,7 @@
         android:text="6"
         android:id="@+id/time_two"
         android:layout_weight="1"
-        android:textSize="35dp" />
+        android:textSize="35dp"
+        android:textAlignment="center" />
 
 </LinearLayout>

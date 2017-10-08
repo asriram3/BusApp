@@ -119,8 +119,8 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
                 onLocationGranted();
             }
         });
@@ -130,8 +130,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     @Override
     protected void onResume() {
         super.onResume();
-        if(quickViewFragment!=null)
-            quickViewFragment.refresh();
         onLocationGranted();
     }
 
@@ -172,6 +170,9 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             return;
         }
+
+        if(quickViewFragment!=null)
+            quickViewFragment.refresh();
 
         if(mGoogleApiClient==null){
             System.out.println("mGoogleApiClient was null in onLocationGranted()");

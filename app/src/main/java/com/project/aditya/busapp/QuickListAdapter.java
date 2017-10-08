@@ -51,6 +51,14 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
         }
     }
 
+    private ArrayList<BusTimes> busTimes;
+    public ArrayList<BusTimes> getBusTimes(){
+        return  busTimes;
+    }
+    public void setBusTimes(ArrayList<BusTimes> bT){
+        busTimes = bT;
+    }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent){
         View v = convertView;
@@ -76,6 +84,7 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
         Set<String> servicesSet = sharedPreferences.getStringSet(stop_num, null);
+
         final ArrayList<String> services = new ArrayList<>();
         services.addAll(servicesSet);
 
@@ -92,6 +101,43 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
                 serviceLayout.addView(child);
             }
         }
+
+//        if(shown[position]){
+//
+//            busTimes = null;
+//            GetBusTimes getBusTimes = new GetBusTimes(getContext());
+//            getBusTimes.execute(stop_num);
+//
+//            while(busTimes==null){
+//                System.out.println("waiting for GetBusTimes. Stop_num: "+stop_num);
+//            }
+//
+//            for(String str : services){
+//                View child = li.inflate(R.layout.service_time_layout_list_item, null);
+//
+//                TextView tv = (TextView) child.findViewById(R.id.service_no);
+//                tv.setText(str);
+//
+//                BusTimes thisBusTimes = null;
+//                for(BusTimes busTime : busTimes){
+//                    if(busTime.getNum().equals(str)){
+//                        thisBusTimes = busTime;
+//                        break;
+//                    }
+//                }
+//
+//                if(thisBusTimes != null){
+//                    String time1 = ""+thisBusTimes.getT1();
+//                    String time2 = ""+thisBusTimes.getT2();
+//
+//                    ((TextView) child.findViewById(R.id.time_one)).setText(time1);
+//                    ((TextView) child.findViewById(R.id.time_two)).setText(time2);
+//
+//                }
+//
+//                serviceLayout.addView(child);
+//            }
+//        }
 
         stopText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,6 +162,48 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
                     shown[position] = false;
                 }
                 else{
+
+
+//                    ArrayList<BusTimes> busTimes2 = null;
+//                    setBusTimes(null);
+//                    GetBusTimes getBusTimes = new GetBusTimes(getContext());
+//                    getBusTimes.execute(stop_num);
+//
+//                    while(busTimes2==null){
+//                        System.out.println("waiting for GetBusTimes. Stop_num: "+stop_num);
+//                        busTimes2 = getBusTimes();
+//                    }
+//
+//                    for(String str : services){
+//                        View child = li.inflate(R.layout.service_time_layout_list_item, null);
+//
+//                        TextView tv = (TextView) child.findViewById(R.id.service_no);
+//                        tv.setText(str);
+//
+//                        BusTimes thisBusTimes = null;
+//                        for(BusTimes busTime : busTimes2){
+//                            if(busTime.getNum().equals(str)){
+//                                thisBusTimes = busTime;
+//                                break;
+//                            }
+//                        }
+//
+//                        if(thisBusTimes != null){
+//                            String time1 = ""+thisBusTimes.getT1();
+//                            String time2 = ""+thisBusTimes.getT2();
+//
+//                            ((TextView) child.findViewById(R.id.time_one)).setText(time1);
+//                            ((TextView) child.findViewById(R.id.time_two)).setText(time2);
+//
+//                        }
+//
+//                        serviceLayout.addView(child);
+//                    }
+
+
+
+
+
                     for(String str : services){
                         View child = li.inflate(R.layout.simple_list_item, null);
 
@@ -123,6 +211,7 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
                         tv.setText(str);
                         serviceLayout.addView(child);
                     }
+
                     stopButton.setImageResource(android.R.drawable.arrow_up_float);
                     shown[position] = true;
                 }
@@ -133,8 +222,8 @@ public class QuickListAdapter extends ArrayAdapter<String> implements GetBusTime
     }
 
     @Override
-    public void onReceived(ArrayList<BusTimes> busTimes) {
-
+    public void onReceived(ArrayList<BusTimes> busTimes1) {
+        setBusTimes(busTimes1);
     }
     public String loadJSONFromAsset(String filename) {
         String json = null;
