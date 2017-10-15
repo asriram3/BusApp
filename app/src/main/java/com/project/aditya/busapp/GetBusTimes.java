@@ -44,7 +44,7 @@ public class GetBusTimes extends AsyncTask<String, Void, ArrayList<BusTimes>> {
 
         try {
             // Construct the URL
-            URL url = new URL("http://datamall2.mytransport.sg/ltaodataservice/BusArrival?BusStopID="+params[0]+"&SST=True");
+            URL url = new URL("http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode="+params[0]);
 
             // Create the request and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -125,27 +125,36 @@ public class GetBusTimes extends AsyncTask<String, Void, ArrayList<BusTimes>> {
     public BusTimes getBusTimes(JSONObject myJSON, int pos){
         BusTimes bt;
         String no = "";
-        int t1=-1,t2=-1;
+        int t1=-1,t2=-1, t3=-1;
         try{
             JSONObject bus = myJSON.getJSONArray("Services").getJSONObject(pos);
             no = bus.getString("ServiceNo");
+
             String time1 = bus.getJSONObject("NextBus").getString("EstimatedArrival");
             if(time1.equals("")){
-                bt = new BusTimes(no, -1, -1);
+                bt = new BusTimes(no, -1, -1, -1);
                 return  bt;
             }
             t1 = getTimeFromString(time1);
-            String time2 = bus.getJSONObject("SubsequentBus").getString("EstimatedArrival");
+
+            String time2 = bus.getJSONObject("NextBus2").getString("EstimatedArrival");
             if(time2.equals("")){
-                bt = new BusTimes(no, t1, -1);
+                bt = new BusTimes(no, t1, -1, -1);
                 return bt;
             }
             t2 = getTimeFromString(time2);
 
+            String time3 = bus.getJSONObject("NextBus3").getString("EstimatedArrival");
+            if(time3.equals("")){
+                bt = new BusTimes(no, t1, t2, -1);
+                return bt;
+            }
+            t3 = getTimeFromString(time3);
+
         }catch (Exception e){
             e.printStackTrace();
         }
-        return new BusTimes(no, t1, t2);
+        return new BusTimes(no, t1, t2, t3);
     }
 
     public int getTimeFromString(String time){
@@ -164,7 +173,7 @@ public class GetBusTimes extends AsyncTask<String, Void, ArrayList<BusTimes>> {
         if(busTimes!=null){
             for(int i = 0; i<busTimes.size(); i++){
                 System.out.println("Bus no: "+busTimes.get(i).getNum()
-                        +" Time1: "+busTimes.get(i).getT1()+" Time2: "+busTimes.get(i).getT2());
+                        +" Time1: "+busTimes.get(i).getT1()+" Time2: "+busTimes.get(i).getT2()+" Time3: "+busTimes.get(i).getT3());
                 serviceList.add(busTimes.get(i).getNum());
             }
 

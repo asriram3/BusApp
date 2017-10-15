@@ -114,22 +114,33 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
 
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        assert fab != null;
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-                onLocationGranted();
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        assert fab != null;
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+////                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+////                        .setAction("Action", null).show();
+//                onLocationGranted();
+//            }
+//        });
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+            System.out.println("Initialized mGoogleApiClient!");
+        }
+
+
         onLocationGranted();
     }
 
@@ -181,13 +192,13 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
-            return;
+//            return;
         }
 
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         if (location == null) {
-//            Toast.makeText(MainActivity.this, "Location not available", Toast.LENGTH_SHORT).show();
+        //    Toast.makeText(MainActivity.this, "Location not available", Toast.LENGTH_SHORT).show();
             return;
         }
 

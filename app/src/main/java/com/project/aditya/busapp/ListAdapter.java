@@ -41,6 +41,7 @@ public class ListAdapter extends ArrayAdapter<BusTimes> {
         TextView tv1 = (TextView) v.findViewById(R.id.service_no);
         TextView tv2 = (TextView) v.findViewById(R.id.time_one);
         TextView tv3 = (TextView) v.findViewById(R.id.time_two);
+        TextView tv4 = (TextView) v.findViewById(R.id.time_three);
 
         //Log.d("Custom Adapter", "Setting Text :" +position);
         //Log.d("Custom Adapter", "Text :" + );
@@ -65,9 +66,21 @@ public class ListAdapter extends ArrayAdapter<BusTimes> {
             tv3.setText("No ETA");
         }
 
-        if(x.getT1()<0 && x.getT2()<0){
+        if(x.getT3()>0){
+            tv4.setText(""+x.getT3());
+        }else{
+            tv4.setText("No ETA");
+        }
+
+        if(x.getT2()<0 && x.getT3()<0){
+            tv3.setText("No");
+            tv4.setText("ETA");
+        }
+
+        if((x.getT1()<0 && x.getT2()<0) && x.getT3()<0){
             tv2.setText("No");
-            tv3.setText("ETA");
+            tv3.setText("Est.");
+            tv4.setText("Avail");
         }
 
         //Log.d("Custom Adapter", "Set Text :" +position);

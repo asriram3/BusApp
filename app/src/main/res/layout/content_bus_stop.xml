@@ -76,8 +76,17 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Subsequent"
+            android:text="Next2"
             android:id="@+id/textView3"
+            android:layout_weight="1"
+            android:textSize="15dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Next3"
+            android:id="@+id/textView4"
             android:layout_weight="1"
             android:textSize="15dp" />
     </LinearLayout>

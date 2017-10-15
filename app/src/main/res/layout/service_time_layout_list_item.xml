@@ -31,4 +31,13 @@
         android:textSize="35dp"
         android:textAlignment="center" />
 
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="12"
+        android:id="@+id/time_three"
+        android:layout_weight="1"
+        android:textSize="35dp"
+        android:textAlignment="center" />
+
 </LinearLayout>
